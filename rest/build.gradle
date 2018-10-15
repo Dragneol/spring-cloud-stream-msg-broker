@@ -1,0 +1,47 @@
+apply plugin: 'maven-publish'
+
+jar {
+    baseName = 'rest'
+}
+
+dependencies {
+    compile 'org.springframework:spring-web'
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        //where define repository for publishing
+//                maven{
+//        //publish to S3 in aws
+//            url "s3://jp-artifacts/maven/"
+//            credentials(AwsCredentials) {
+//                accessKey AWS_ACCESS_KEY
+//                secretKey AWS_SECRET_KEY
+//                sessionToken AWS_SESSION_TOKEN
+//            }
+//        }
+
+//        maven {
+//            // publish to custom maven repository
+//            // url "http://repo2.jp.com/maven2"
+//            // credentials {
+//            // username "user"
+//            // password "password"
+//        }
+
+        maven {
+            url "file:/${rootProject.rootDir}/releases-repo/rest"
+        }
+
+        maven {
+            url "file:/${rootProject.rootDir}/remote-repo/rest"
+        }
+    }
+}

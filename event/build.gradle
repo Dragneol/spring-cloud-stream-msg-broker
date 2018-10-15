@@ -1,0 +1,66 @@
+apply plugin: 'java'
+apply plugin: 'com.commercehub.gradle.plugin.avro-base'
+apply plugin: 'maven-publish'
+
+jar {
+    baseName = 'event'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs "${buildDir}/generated-sources"
+        }
+    }
+}
+
+// configure code generator
+task generateAvro(type: com.commercehub.gradle.plugin.avro.GenerateAvroJavaTask) {
+    source("src/main/resources/META-INF/schema")
+    outputDir = file("${buildDir}/generated-sources")
+}
+compileJava.source(generateAvro.outputs)
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        //where define repository for publishing
+//        maven{
+//             //publish to S3 in aws
+//            url "s3://jp-artifacts/maven/"
+//            credentials(AwsCredentials) {
+//                accessKey AWS_ACCESS_KEY
+//                secretKey AWS_SECRET_KEY
+//                sessionToken AWS_SESSION_TOKEN
+//            }
+
+//        }
+//        maven {
+//            // publish to custom maven repository
+//            // url "http://repo2.jp.com/maven2"
+//            // credentials {
+//            // username "user"
+//            // password "password"
+//        }
+
+        maven {
+            url "file:/${rootProject.rootDir}/releases-repo/event"
+        }
+
+        maven {
+            url "file:/${rootProject.rootDir}/remote-repo/event"
+            println "${rootProject.rootDir}"
+        }
+    }
+
+}
+
+
+dependencies {
+    compile "org.apache.avro:avro:${avroVersion}"
+}
